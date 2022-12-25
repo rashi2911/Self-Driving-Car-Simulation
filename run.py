@@ -24,6 +24,7 @@ smoothed_angle = 0
 i = 0
 while(cv2.waitKey(10) != ord('q')):
     full_image = cv2.imread("driving_dataset/" + str(i) + ".jpg")
+    #to resize image 
     image = cv2.resize(full_image[-150:], (200, 66)) / 255.0
     degrees = model.y.eval(feed_dict={model.x: [image], model.keep_prob: 1.0})[
         0][0] * 180.0 / 3.14159265
@@ -35,7 +36,9 @@ while(cv2.waitKey(10) != ord('q')):
     # and the predicted angle
     smoothed_angle += 0.2 * pow(abs((degrees - smoothed_angle)), 2.0 / 3.0) * (
         degrees - smoothed_angle) / abs(degrees - smoothed_angle)
+    # make the transformation matrix M which will be used for rotating a image. 
     M = cv2.getRotationMatrix2D((cols/2, rows/2), -smoothed_angle, 1)
+    #performs an affine transformation to an image.
     dst = cv2.warpAffine(img, M, (cols, rows))
     cv2.imshow("steering wheel", dst)
     i += 1
